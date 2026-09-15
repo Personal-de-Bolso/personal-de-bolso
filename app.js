@@ -139,18 +139,18 @@ function progressionMessage(name,weight,reps){
 
 function getTodayPlan(){return state.plan[state.total%Math.max(1,state.plan.length)]||state.plan[0]}
 function initWorkout(){
- const day=getTodayPlan();state.currentDay=day?state.plan.indexOf(day):0;
- state.workout={ex:0,set:1,done:0,dayIndex:state.currentDay,session:[]};
- const x=state.workout.ex,set=state.workout.set,e=day?.exercises[x]||makeExercise("Supino reto",3,8,12,90);
+ const day=getTodayPlan();
+ if(!day||!day.exercises.length)return;
+ const x=state.workout.ex,set=state.workout.set,e=day.exercises[x]||day.exercises[0];
  $("#wName").textContent=e.name;
  $("#wTarget").textContent=`${e.repsMin}–${e.repsMax} repetições · descanso ${e.rest}s`;
  $("#setNo").textContent=set;$("#setTotal").textContent=e.sets;
- $("#workoutProgress").textContent=`${x+1} / ${day?.exercises.length||1}`;
+ $("#workoutProgress").textContent=`${x+1} / ${day.exercises.length}`;
  const prev=state.history.filter(h=>h.exercise===e.name).slice(-1)[0];
  $("#wWeight").value=prev?prev.weight:0;
  $("#wReps").value=prev?Math.min(e.repsMax,Math.max(e.repsMin,prev.reps)):e.repsMin;
  $("#lastHint").textContent=prev?`Último: ${prev.weight} kg × ${prev.reps}`:"";
- $("#nextExercise").textContent=x<(day?.exercises.length||1)-1?day.exercises[x+1].name:"Finalizar treino";
+ $("#nextExercise").textContent=x<day.exercises.length-1?day.exercises[x+1].name:"Finalizar treino";
 }
 function startRest(){
  const day=getTodayPlan(),e=day.exercises[state.workout.ex];
@@ -168,7 +168,14 @@ document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{do
 $("#styleNext").addEventListener("click",()=>{go("ai");if(!$("#chat").children.length)setTimeout(()=>{addBubble(`Agora eu vou te fazer algumas perguntas, ${state.profile.name}. Responda com sinceridade. Meu trabalho é montar algo que você realmente consiga manter.`);setTimeout(renderQuestion,400)},250)});
 $("#acceptPlan").addEventListener("click",()=>{if(!state.plan.length)return;state.total=0;state.xp=0;state.streak=0;state.week={workouts:0};save();updateDash();go("dashboard")});
 $("#addDay").addEventListener("click",()=>{const n=state.plan.length+1;state.plan.push({name:`Treino ${String.fromCharCode(64+n)}`,exercises:[makeExercise("Supino reto",3,8,12,90)]});renderPlanEditor()});
-$("#startWorkout").addEventListener("click",()=>{getTodayPlan();go("workout");initWorkout()});
+$("#startWorkout").addEventListener("click",()=>{
+ const day=getTodayPlan();
+ if(!day||!day.exercises.length){alert("Este treino ainda não tem exercícios.");return}
+ state.currentDay=state.plan.indexOf(day);
+ state.workout={ex:0,set:1,done:0,dayIndex:state.currentDay,session:[]};
+ go("workout");
+ initWorkout();
+});
 $("#backDash").addEventListener("click",()=>{clearInterval(timerId);updateDash();go("dashboard")});
 $("#skipRest").addEventListener("click",()=>{clearInterval(timerId);$("#restCard").classList.add("hidden");$("#completeSet").disabled=false});
 
@@ -178,8 +185,19 @@ $("#completeSet").addEventListener("click",()=>{
  const date=new Date().toLocaleDateString("pt-BR");
  state.history.push({exercise:e.name,weight:w,reps:r,date});
  state.lastWeight=w;state.lastHint=`Última: ${w} kg × ${r}`;state.workout.done++;
- if(state.workout.set<e.sets){state.workout.set++;startRest();initWorkout();return}
- if(state.workout.ex<day.exercises.length-1){state.workout.ex++;state.workout.set=1;startRest();initWorkout();return}
+ if(state.workout.set<e.sets){
+   state.workout.set++;
+   initWorkout();
+   startRest();
+   return;
+ }
+ if(state.workout.ex<day.exercises.length-1){
+   state.workout.ex++;
+   state.workout.set=1;
+   initWorkout();
+   startRest();
+   return;
+ }
  clearInterval(timerId);state.xp+=400;state.total++;state.streak++;state.week.workouts++;
  save();
  $("#gainXp").textContent=400;
