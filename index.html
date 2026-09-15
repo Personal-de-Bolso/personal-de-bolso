@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0d10">
+  <title>Personal de Bolso</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <section class="screen active" id="welcome">
+      <div class="hero">
+        <div class="badge">PERSONAL DE BOLSO</div>
+        <h1>Seu treino.<br><span>Sem desculpas.</span></h1>
+        <p>Um personal no seu bolso para montar seu treino, conduzir cada série e cobrar constância.</p>
+        <button class="primary" data-go="profile">COMEÇAR</button>
+      </div>
+    </section>
+
+    <section class="screen" id="profile">
+      <div class="top"><span class="step">01 / 02</span><span>Perfil</span></div>
+      <h2>Primeiro, quero te conhecer.</h2>
+      <p class="muted">Nada de interrogatório infinito. Só o necessário para começar.</p>
+      <form id="profileForm">
+        <label>Como quer ser chamado?
+          <input required name="name" placeholder="Seu nome">
+        </label>
+        <div class="grid2">
+          <label>Idade
+            <input required name="age" type="number" min="13" max="100" placeholder="Ex.: 37">
+          </label>
+          <label>Altura (cm)
+            <input required name="height" type="number" min="100" max="250" placeholder="Ex.: 183">
+          </label>
+        </div>
+        <div class="grid2">
+          <label>Peso (kg)
+            <input required name="weight" type="number" min="30" max="400" step="0.1" placeholder="Ex.: 121">
+          </label>
+          <label>Experiência
+            <select name="experience">
+              <option value="iniciante">Iniciante</option>
+              <option value="intermediario">Intermediário</option>
+              <option value="avancado">Avançado</option>
+            </select>
+          </label>
+        </div>
+        <button class="primary" type="submit">CONTINUAR</button>
+      </form>
+    </section>
+
+    <section class="screen" id="ai">
+      <div class="top"><span class="step">02 / 02</span><span>Personal IA</span></div>
+      <div class="ai-head">
+        <div class="avatar">PB</div>
+        <div><strong>Personal de Bolso</strong><small>Montando seu perfil de treino</small></div>
+      </div>
+      <div id="chat" class="chat"></div>
+      <div id="choices" class="choices"></div>
+      <form id="textForm" class="chat-input hidden">
+        <input id="chatInput" placeholder="Digite sua resposta...">
+        <button type="submit">→</button>
+      </form>
+    </section>
+
+    <section class="screen" id="plan">
+      <div class="top"><span>SEU PRIMEIRO PLANO</span><span class="status">PRONTO</span></div>
+      <h2 id="planTitle">Seu treino está tomando forma.</h2>
+      <p class="muted" id="planIntro"></p>
+      <div id="planCards"></div>
+      <button class="primary" id="acceptPlan">🔥 ACEITAR E COMEÇAR</button>
+      <button class="secondary" id="restart">Refazer perguntas</button>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
