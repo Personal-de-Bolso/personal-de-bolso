@@ -17,7 +17,7 @@
 </section>
 
 <section class="screen" id="profile">
-  <div class="top"><span class="step">01 / 03</span><span>Perfil</span></div>
+  <div class="top"><button class="back" id="backWelcome">← voltar</button><span class="step">01 / 03</span><span>Perfil</span></div>
   <h2>Primeiro, quero te conhecer.</h2>
   <p class="muted">Só o necessário para eu não te entregar um treino genérico.</p>
   <form id="profileForm">
@@ -35,7 +35,7 @@
 </section>
 
 <section class="screen" id="style">
-  <div class="top"><span class="step">02 / 03</span><span>Personalidade</span></div>
+  <div class="top"><button class="back" id="backProfile">← voltar</button><span class="step">02 / 03</span><span>Personalidade</span></div>
   <h2>Agora me diga como devo te cobrar.</h2>
   <p class="muted">Isso muda a forma como o Personal conversa com você.</p>
   <div class="mode-list">
@@ -47,7 +47,7 @@
 </section>
 
 <section class="screen" id="ai">
-  <div class="top"><span class="step">03 / 03</span><span>Entrevista</span></div>
+  <div class="top"><button class="back" id="backStyle">← voltar</button><span class="step">03 / 03</span><span>Entrevista</span></div>
   <div class="ai-head"><div class="avatar">PB</div><div><strong>Personal de Bolso</strong><small>Entrevista para montar seu treino</small></div></div>
   <div id="chat" class="chat"></div>
   <div id="choices" class="choices"></div>
@@ -55,11 +55,27 @@
 </section>
 
 <section class="screen" id="plan">
-  <div class="top"><span>PRIMEIRO PLANO</span><span class="status">EDITÁVEL</span></div>
+  <div class="top"><button class="back" id="backAI">← voltar</button><span>PRIMEIRO PLANO</span><span class="status">EDITÁVEL</span></div>
   <h2 id="planTitle"></h2><p class="muted" id="planIntro"></p>
   <div class="callout"><b>🤖 Por que esse plano?</b><p id="planReason"></p></div>
   <div id="planCards" class="editable-plan"></div>
   <button class="secondary" id="addDay">＋ ADICIONAR TREINO</button>
+  <button class="secondary" id="showCustom">＋ EXERCÍCIO FORA DA BIBLIOTECA</button>
+  <div id="customExerciseForm" class="custom-exercise hidden">
+    <div class="eyebrow">NOVO EXERCÍCIO</div>
+    <label>Nome do exercício<input id="customName" maxlength="60" placeholder="Ex.: Crucifixo na máquina"></label>
+    <div class="grid2">
+      <label>Séries<input id="customSets" type="number" min="1" max="10" value="3"></label>
+      <label>Reps mín.<input id="customMin" type="number" min="1" max="50" value="8"></label>
+      <label>Reps máx.<input id="customMax" type="number" min="1" max="50" value="12"></label>
+      <label>Descanso (seg.)<input id="customRest" type="number" min="15" max="600" value="90"></label>
+      <label>Adicionar em<select id="customDay"></select></label>
+    </div>
+    <div class="grid2">
+      <button type="button" class="secondary" id="cancelCustom">CANCELAR</button>
+      <button type="button" class="primary" id="saveCustom">＋ ADICIONAR</button>
+    </div>
+  </div>
   <button class="primary" id="acceptPlan">🔥 SALVAR E ACEITAR TREINO</button>
 </section>
 
@@ -80,7 +96,7 @@
     <h3 id="progressTitle">Seu último treino</h3>
     <p id="progressText" class="muted"></p>
   </div>
-  <div class="pb-card"><div class="eyebrow">PERSONAL</div><p id="dashMessage" class="quote"></p></div>
+  <div class="grid2 action-grid"><button class="secondary" id="editPlanHome">✏️ EDITAR TREINO</button><button class="secondary" id="redoInterview">🧠 REFAZER ENTREVISTA</button></div><div class="pb-card"><div class="eyebrow">PERSONAL</div><p id="dashMessage" class="quote"></p></div>
 </section>
 
 <section class="screen" id="workout">

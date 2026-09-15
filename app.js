@@ -72,6 +72,19 @@ function buildPlan(){
  renderPlanEditor();go("plan")
 }
 
+function populateCustomDay(){
+ const sel=$("#customDay"); if(!sel)return;
+ sel.innerHTML=state.plan.map((d,i)=>`<option value="${i}">${d.name}</option>`).join("");
+}
+function openPlanEditor(){
+ if(!state.plan.length){alert("Ainda não existe um treino salvo. Complete a entrevista primeiro.");return;}
+ populateCustomDay(); renderPlanEditor(); go("plan");
+}
+function startFreshInterview(){
+ state.q=0;state.answers={};$("#chat").innerHTML="";$("#choices").innerHTML="";$("#textForm").classList.add("hidden");$("#chatInput").value="";
+ go("ai");
+ setTimeout(()=>{addBubble(`Vamos refazer isso, ${state.profile.name||"atleta"}. Quero atualizar o treino com base no que mudou.`);setTimeout(renderQuestion,400)},250);
+}
 function renderPlanEditor(){
  const box=$("#planCards");box.innerHTML="";
  state.plan.forEach((day,di)=>{
@@ -92,6 +105,7 @@ function renderExerciseRow(parent,ex,di,ei){
  <label>Séries<input data-field="sets" type="number" min="1" max="10" value="${ex.sets}"></label>
  <label>Reps mín.<input data-field="repsMin" type="number" min="1" max="50" value="${ex.repsMin}"></label>
  <label>Reps máx.<input data-field="repsMax" type="number" min="1" max="50" value="${ex.repsMax}"></label>
+ <label>Descanso<input data-field="rest" type="number" min="15" max="600" value="${ex.rest}"></label>
  <button type="button" class="remove-ex">×</button>`;
  parent.appendChild(row);
  row.querySelectorAll("[data-field]").forEach(el=>el.addEventListener("change",()=>{
@@ -165,9 +179,27 @@ function updateTimer(){
 $("#begin").addEventListener("click",()=>go("profile"));
 $("#profileForm").addEventListener("submit",e=>{e.preventDefault();state.profile=Object.fromEntries(new FormData(e.currentTarget));go("style")});
 document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll(".mode").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");state.style=b.dataset.mode}));
-$("#styleNext").addEventListener("click",()=>{go("ai");if(!$("#chat").children.length)setTimeout(()=>{addBubble(`Agora eu vou te fazer algumas perguntas, ${state.profile.name}. Responda com sinceridade. Meu trabalho é montar algo que você realmente consiga manter.`);setTimeout(renderQuestion,400)},250)});
+$("#styleNext").addEventListener("click",()=>{
+ state.q=0;state.answers={};$("#chat").innerHTML="";$("#choices").innerHTML="";$("#textForm").classList.add("hidden");
+ go("ai");
+ setTimeout(()=>{addBubble(`Agora eu vou te fazer algumas perguntas, ${state.profile.name}. Responda com sinceridade. Meu trabalho é montar algo que você realmente consiga manter.`);setTimeout(renderQuestion,400)},250);
+});
 $("#acceptPlan").addEventListener("click",()=>{if(!state.plan.length)return;state.total=0;state.xp=0;state.streak=0;state.week={workouts:0};save();updateDash();go("dashboard")});
 $("#addDay").addEventListener("click",()=>{const n=state.plan.length+1;state.plan.push({name:`Treino ${String.fromCharCode(64+n)}`,exercises:[makeExercise("Supino reto",3,8,12,90)]});renderPlanEditor()});
+$("#backWelcome").addEventListener("click",()=>go("welcome"));
+$("#backProfile").addEventListener("click",()=>go("profile"));
+$("#backStyle").addEventListener("click",()=>go("style"));
+$("#backAI").addEventListener("click",()=>go("ai"));
+$("#editPlanHome").addEventListener("click",()=>openPlanEditor());
+$("#redoInterview").addEventListener("click",()=>startFreshInterview());
+$("#showCustom").addEventListener("click",()=>{populateCustomDay();$("#customExerciseForm").classList.remove("hidden");$("#customName").focus()});
+$("#cancelCustom").addEventListener("click",()=>$("#customExerciseForm").classList.add("hidden"));
+$("#saveCustom").addEventListener("click",()=>{
+ const name=$("#customName").value.trim(),sets=Number($("#customSets").value),min=Number($("#customMin").value),max=Number($("#customMax").value),rest=Number($("#customRest").value),dayIndex=Number($("#customDay").value);
+ if(!name||!Number.isInteger(sets)||sets<1||!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min||!Number.isInteger(rest)||rest<15||!state.plan[dayIndex]){alert("Preencha os dados corretamente.");return}
+ state.plan[dayIndex].exercises.push(makeExercise(name,sets,min,max,rest));save();
+ $("#customName").value="";$("#customExerciseForm").classList.add("hidden");renderPlanEditor();
+});
 $("#startWorkout").addEventListener("click",()=>{
  const day=getTodayPlan();
  if(!day||!day.exercises.length){alert("Este treino ainda não tem exercícios.");return}
