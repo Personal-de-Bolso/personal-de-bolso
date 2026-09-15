@@ -46,7 +46,11 @@ function updateDash(){
  const target=state.plan.length||3;$("#missionText").textContent=`Complete ${target} treinos`;$("#missionProgress").textContent=`${Math.min(state.total,target)} / ${target}`;
  const today=state.plan[0]||{name:"Treino A",items:"Seu primeiro treino"};
  $("#todayName").textContent=today.name;$("#todayMeta").textContent=today.items;
- const mode=state.style==="partner"?"Vamos fazer o básico muito bem e manter a consistência.":state.style==="hard"?"Você disse que quer mudar. Então pare de negociar com a preguiça e faça o trabalho.":"Você não precisa estar motivado. Precisa começar. Depois do primeiro exercício, a conversa fica mais fácil.";
+ const mode=state.style==="partner"
+ ? "Vamos fazer o básico muito bem e manter a consistência. Sem pressão desnecessária — o importante é aparecer e executar."
+ : state.style==="sergeant"
+ ? "Você disse que quer mudar. Então pare de negociar com a preguiça e faça o trabalho. Motivação ajuda, mas disciplina é o que te faz aparecer."
+ : "Você quer mudar de verdade? Então pare de procurar desculpas. Levanta, começa e faz o trabalho. A conversa sobre preguiça fica para depois do treino.";
  $("#dashMessage").textContent=mode;
 }
 function initWorkout(){

@@ -1,19 +1,20 @@
-# Personal de Bolso — V1.1.1
+# Personal de Bolso — V1.1.2
 
-Correção do botão inicial "COMEÇAR MINHA JORNADA".
+Correção da personalidade **Sargento**.
 
-## Arquivos
+## Correção
+Agora os três modos do app correspondem exatamente às opções exibidas:
+
+- 🤝 Parceiro — direto e motivador, sem pressão desnecessária.
+- 😈 Sargento — cobra disciplina e confronta a negociação com a preguiça.
+- ☠️ Sem Piedade — mais provocador e confrontativo.
+
+O Sargento continua sendo o modo selecionado por padrão.
+
+## Atualização no GitHub
+Substitua no repositório os arquivos:
 - index.html
 - styles.css
 - app.js
 
-## Como atualizar no GitHub
-1. Abra o repositório `personal-de-bolso`.
-2. Clique em **Add file → Upload files**.
-3. Envie os três arquivos desta pasta.
-4. Escolha substituir os arquivos existentes.
-5. Clique em **Commit changes**.
-6. Aguarde o GitHub Pages publicar a alteração.
-7. Faça um hard refresh no navegador (Ctrl + F5).
-
-A lógica original do aplicativo foi preservada.
+Depois faça **Commit changes** e, quando o GitHub Pages atualizar, use **Ctrl + F5** para recarregar sem cache.
