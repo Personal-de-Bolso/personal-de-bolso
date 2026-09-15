@@ -1,28 +1,27 @@
-# Personal de Bolso V1.2.4
+# Personal de Bolso V1.2.6
 
-## Substituição de exercício durante o treino
+## Editor de treino redesenhado
 
-Agora é possível substituir o exercício atual sem apagar nem alterar o histórico do exercício original.
+O editor agora funciona por navegação em etapas:
 
-### Como funciona
-Durante a execução aparece:
-**🔄 SUBSTITUIR EXERCÍCIO**
+**1. Escolha o treino**
+- mostra somente o nome e a quantidade de exercícios.
 
-O usuário escolhe outro exercício e continua a sessão.
+**2. Escolha o exercício**
+- mostra os exercícios daquele treino.
 
-A substituição é **somente para a sessão atual**:
-- o exercício original continua no treino salvo;
-- o histórico do exercício original permanece intacto;
-- as séries feitas do exercício substituto são registradas com o nome do substituto;
-- ao iniciar um novo treino, o plano volta a usar o exercício original;
-- o histórico dos dois exercícios fica separado.
+**3. Edite o exercício**
+- séries;
+- repetições mínimas;
+- repetições máximas;
+- descanso.
 
-Também funciona com exercícios personalizados cadastrados no editor.
+Também é possível criar um exercício personalizado diretamente dentro do treino escolhido.
+
+O histórico não é apagado quando o exercício é editado ou substituído durante uma sessão.
 
 ## Atualização
-Substitua no GitHub:
+Substitua juntos:
 - index.html
 - styles.css
 - app.js
-
-Faça Commit changes e aguarde o GitHub Pages atualizar.

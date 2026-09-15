@@ -86,34 +86,66 @@ function startFreshInterview(){
  setTimeout(()=>{addBubble(`Vamos refazer isso, ${state.profile.name||"atleta"}. Quero atualizar o treino com base no que mudou.`);setTimeout(renderQuestion,400)},250);
 }
 function renderPlanEditor(){
- const box=$("#planCards");box.innerHTML="";
+ const box=$("#planCards");
+ box.innerHTML="";
+ const wrap=document.createElement("div");
+ wrap.className="plan-selector";
  state.plan.forEach((day,di)=>{
-  const card=document.createElement("div");card.className="edit-day";
-  card.innerHTML=`<div class="edit-day-head"><h3 contenteditable="true" data-day-title="${di}">${day.name}</h3><button type="button" class="icon-btn" data-remove-day="${di}">EXCLUIR</button></div><div class="day-exercises"></div><button type="button" class="add-ex" data-add-ex="${di}">＋ ADICIONAR EXERCÍCIO</button>`;
-  box.appendChild(card);
-  const exBox=card.querySelector(".day-exercises");
-  day.exercises.forEach((ex,ei)=>renderExerciseRow(exBox,ex,di,ei));
+  const b=document.createElement("button");
+  b.type="button";b.className="plan-day-button";
+  b.innerHTML=`<span><b>${day.name}</b><small>${day.exercises.length} exercícios · toque para abrir</small></span><span class="arrow">›</span>`;
+  b.addEventListener("click",()=>openDayEditor(di));
+  wrap.appendChild(b);
  });
- box.querySelectorAll("[data-day-title]").forEach(el=>el.addEventListener("input",()=>state.plan[Number(el.dataset.dayTitle)].name=el.textContent.trim()||`Treino ${Number(el.dataset.dayTitle)+1}`));
- box.querySelectorAll("[data-remove-day]").forEach(b=>b.addEventListener("click",()=>{if(state.plan.length<=2){alert("Mantenha pelo menos 2 treinos.");return}state.plan.splice(Number(b.dataset.removeDay),1);renderPlanEditor()}));
- box.querySelectorAll("[data-add-ex]").forEach(b=>b.addEventListener("click",()=>{state.plan[Number(b.dataset.addEx)].exercises.push(makeExercise("Supino reto",3,8,12,90));renderPlanEditor()}));
+ box.appendChild(wrap);
 }
-function renderExerciseRow(parent,ex,di,ei){
- const row=document.createElement("div");row.className="exercise-row";
- const options=exerciseLibrary.map(x=>`<option ${x[0]===ex.name?"selected":""}>${x[0]}</option>`).join("");
- row.innerHTML=`<label>Exercício<select data-field="name">${options}</select></label>
- <label>Séries<input data-field="sets" type="number" min="1" max="10" value="${ex.sets}"></label>
- <label>Reps mín.<input data-field="repsMin" type="number" min="1" max="50" value="${ex.repsMin}"></label>
- <label>Reps máx.<input data-field="repsMax" type="number" min="1" max="50" value="${ex.repsMax}"></label>
- <label>Descanso<input data-field="rest" type="number" min="15" max="600" value="${ex.rest}"></label>
- <button type="button" class="remove-ex">×</button>`;
- parent.appendChild(row);
- row.querySelectorAll("[data-field]").forEach(el=>el.addEventListener("change",()=>{
-  const f=el.dataset.field;state.plan[di].exercises[ei][f]=f==="name"?el.value:Number(el.value);
-  if(f==="name"){const lib=exerciseLibrary.find(x=>x[0]===el.value);if(lib){state.plan[di].exercises[ei].sets=lib[1];state.plan[di].exercises[ei].repsMin=lib[2];state.plan[di].exercises[ei].repsMax=lib[3];state.plan[di].exercises[ei].rest=lib[4]}}
-  save()
- }));
- row.querySelector(".remove-ex").addEventListener("click",()=>{state.plan[di].exercises.splice(ei,1);renderPlanEditor()});
+
+function openDayEditor(di){
+ const day=state.plan[di],box=$("#planCards");
+ box.innerHTML=`<div class="editor-nav"><button type="button" class="back" id="editorBackDays">← voltar</button><span class="editor-breadcrumb">${day.name}</span></div><div class="exercise-selector" id="exerciseSelector"></div><button type="button" class="secondary" id="addExerciseLibrary">＋ ADICIONAR DA BIBLIOTECA</button><button type="button" class="secondary" id="addCustomExercise">＋ CRIAR EXERCÍCIO PERSONALIZADO</button><button type="button" class="secondary delete-action" id="deleteCurrentDay">EXCLUIR ESTE TREINO</button>`;
+ const list=$("#exerciseSelector");
+ day.exercises.forEach((ex,ei)=>{
+  const b=document.createElement("button");b.type="button";b.className="exercise-button";
+  b.innerHTML=`<span><b>${ex.name}</b><small>${ex.sets} séries · ${ex.repsMin}–${ex.repsMax} reps · ${ex.rest}s descanso</small></span><span class="arrow">›</span>`;
+  b.addEventListener("click",()=>openExerciseEditor(di,ei));list.appendChild(b);
+ });
+ $("#editorBackDays").addEventListener("click",renderPlanEditor);
+ $("#deleteCurrentDay").addEventListener("click",()=>{if(state.plan.length<=2){alert("Mantenha pelo menos 2 treinos.");return}state.plan.splice(di,1);save();renderPlanEditor()});
+ $("#addExerciseLibrary").addEventListener("click",()=>{state.plan[di].exercises.push(makeExercise("Supino reto",3,8,12,90));save();openDayEditor(di)});
+ $("#addCustomExercise").addEventListener("click",()=>openNewCustomEditor(di));
+}
+
+function openExerciseEditor(di,ei){
+ const ex=state.plan[di].exercises[ei],box=$("#planCards");
+ box.innerHTML=`<div class="editor-nav"><button type="button" class="back" id="editorBackExercises">← voltar</button><span class="editor-breadcrumb">${state.plan[di].name}</span></div><div class="editor-detail"><div class="eyebrow">EDITANDO EXERCÍCIO</div><h3>${ex.name}</h3><div class="grid2"><label>Séries<input id="editSets" type="number" min="1" max="10" value="${ex.sets}"></label><label>Repetições mín.<input id="editMin" type="number" min="1" max="50" value="${ex.repsMin}"></label><label>Repetições máx.<input id="editMax" type="number" min="1" max="50" value="${ex.repsMax}"></label><label>Descanso (seg.)<input id="editRest" type="number" min="15" max="600" value="${ex.rest}"></label></div><div class="editor-actions"><button type="button" class="primary" id="saveExerciseEdit">✓ SALVAR ALTERAÇÕES</button><button type="button" class="secondary delete-action" id="deleteExercise">EXCLUIR EXERCÍCIO</button></div></div>`;
+ $("#editorBackExercises").addEventListener("click",()=>openDayEditor(di));
+ $("#saveExerciseEdit").addEventListener("click",()=>{
+  const sets=Number($("#editSets").value),min=Number($("#editMin").value),max=Number($("#editMax").value),rest=Number($("#editRest").value);
+  if(!Number.isInteger(sets)||sets<1||!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min||!Number.isInteger(rest)||rest<15){alert("Preencha séries, repetições e descanso corretamente.");return}
+  Object.assign(ex,{sets,repsMin:min,repsMax:max,rest});save();openDayEditor(di);
+ });
+ $("#deleteExercise").addEventListener("click",()=>{state.plan[di].exercises.splice(ei,1);save();openDayEditor(di)});
+}
+
+function openNewCustomEditor(di){
+ const box=$("#planCards");
+ box.innerHTML=`<div class="editor-nav"><button type="button" class="back" id="customBack">← voltar</button><span class="editor-breadcrumb">${state.plan[di].name}</span></div><div class="editor-detail"><div class="eyebrow">NOVO EXERCÍCIO</div><h3>Personalizado</h3><p class="custom-note">Cadastre qualquer exercício que não esteja na biblioteca.</p><label>Nome do exercício<input id="customName" maxlength="60" placeholder="Ex.: Crucifixo na máquina"></label><div class="grid2"><label>Séries<input id="customSets" type="number" min="1" max="10" value="3"></label><label>Repetições mín.<input id="customMin" type="number" min="1" max="50" value="8"></label><label>Repetições máx.<input id="customMax" type="number" min="1" max="50" value="12"></label><label>Descanso (seg.)<input id="customRest" type="number" min="15" max="600" value="90"></label></div><button type="button" class="primary" id="saveCustom">＋ ADICIONAR EXERCÍCIO</button></div>`;
+ $("#customBack").addEventListener("click",()=>openDayEditor(di));
+ $("#saveCustom").addEventListener("click",()=>{
+  const name=$("#customName").value.trim(),sets=Number($("#customSets").value),min=Number($("#customMin").value),max=Number($("#customMax").value),rest=Number($("#customRest").value);
+  if(!name||!Number.isInteger(sets)||sets<1||!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min||!Number.isInteger(rest)||rest<15){alert("Preencha o nome, séries, repetições e descanso corretamente.");return}
+  state.plan[di].exercises.push(makeExercise(name,sets,min,max,rest));save();openDayEditor(di);
+ });
+}
+
+function populateCustomDay(){}
+function openPlanEditor(){
+ if(!state.plan.length){alert("Ainda não existe um treino salvo. Complete a entrevista primeiro.");return}
+ renderPlanEditor();go("plan");
+}
+function startFreshInterview(){
+ state.q=0;state.answers={};$("#chat").innerHTML="";$("#choices").innerHTML="";$("#textForm").classList.add("hidden");$("#chatInput").value="";
+ go("ai");setTimeout(()=>{addBubble(`Vamos refazer isso, ${state.profile.name||"atleta"}. Quero atualizar o treino com base no que mudou.`);setTimeout(renderQuestion,400)},250);
 }
 
 function save(){try{localStorage.setItem("pb_state",JSON.stringify(state))}catch(e){}}
@@ -158,7 +190,19 @@ function getCurrentExercise(){
 }
 function exerciseDefinition(name){
  const lib=exerciseLibrary.find(x=>x[0]===name);
- return lib ? makeExercise(lib[0],lib[1],lib[2],lib[3],lib[4]) : makeExercise(name,3,8,12,90);
+ if(lib) return makeExercise(lib[0],lib[1],lib[2],lib[3],lib[4]);
+
+ // Exercício personalizado: procurar primeiro no plano salvo.
+ // Assim o nome e as configurações cadastradas pelo usuário são preservados.
+ for(const day of state.plan){
+  const custom=day.exercises.find(e=>e.name===name);
+  if(custom){
+   return makeExercise(custom.name,custom.sets,custom.repsMin,custom.repsMax,custom.rest);
+  }
+ }
+
+ // Fallback somente se o nome realmente não existir no plano.
+ return makeExercise(name,3,8,12,90);
 }
 function populateSubstituteSelect(){
  const select=$("#substituteSelect");
@@ -246,7 +290,8 @@ $("#cancelCustom").addEventListener("click",()=>$("#customExerciseForm").classLi
 $("#saveCustom").addEventListener("click",()=>{
  const name=$("#customName").value.trim(),sets=Number($("#customSets").value),min=Number($("#customMin").value),max=Number($("#customMax").value),rest=Number($("#customRest").value),dayIndex=Number($("#customDay").value);
  if(!name||!Number.isInteger(sets)||sets<1||!Number.isInteger(min)||!Number.isInteger(max)||min<1||max<min||!Number.isInteger(rest)||rest<15||!state.plan[dayIndex]){alert("Preencha os dados corretamente.");return}
- state.plan[dayIndex].exercises.push(makeExercise(name,sets,min,max,rest));save();
+ state.plan[dayIndex].exercises.push(makeExercise(name,sets,min,max,rest));
+ save();
  $("#customName").value="";$("#customExerciseForm").classList.add("hidden");renderPlanEditor();
 });
 $("#substituteExercise").addEventListener("click",()=>openSubstitute());
