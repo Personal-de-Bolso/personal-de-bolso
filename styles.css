@@ -5,3 +5,9 @@
 
 /* V1.2.3 */
 .action-grid{margin:12px 0}.action-grid .secondary{margin-top:0}.custom-exercise{background:#11151a;border:1px solid #34401e;border-radius:16px;padding:15px;margin:12px 0}.custom-exercise .grid2{margin-top:10px}.custom-exercise .secondary,.custom-exercise .primary{margin-top:0}
+
+/* V1.2.4 — substituição de exercício durante a execução */
+#substituteExercise{margin-top:12px}
+.substitute-panel{margin-top:12px}
+.substitute-panel .grid2{margin-top:10px}
+.substitute-panel .secondary,.substitute-panel .primary{margin-top:0}

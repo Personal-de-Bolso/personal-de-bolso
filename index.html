@@ -112,6 +112,18 @@
   </div>
   <div id="restCard" class="pb-card rest hidden"><div class="eyebrow">DESCANSO</div><strong id="timer">01:30</strong><div class="bar"><i id="timerFill"></i></div><button class="secondary" id="skipRest">PULAR DESCANSO</button></div>
   <div class="pb-card next"><small>PRÓXIMO</small><b id="nextExercise"></b></div>
+  <button class="secondary" id="substituteExercise">🔄 SUBSTITUIR EXERCÍCIO</button>
+  <div id="substitutePanel" class="pb-card substitute-panel hidden">
+    <div class="eyebrow">SUBSTITUIR SEM APAGAR O HISTÓRICO</div>
+    <p class="muted">O exercício original continua no seu histórico. A substituição vale para esta sessão.</p>
+    <label>Novo exercício
+      <select id="substituteSelect"></select>
+    </label>
+    <div class="grid2">
+      <button type="button" class="secondary" id="cancelSubstitute">CANCELAR</button>
+      <button type="button" class="primary" id="confirmSubstitute">✓ USAR NESTE TREINO</button>
+    </div>
+  </div>
 </section>
 
 <section class="screen" id="finish">

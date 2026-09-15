@@ -152,10 +152,58 @@ function progressionMessage(name,weight,reps){
 }
 
 function getTodayPlan(){return state.plan[state.total%Math.max(1,state.plan.length)]||state.plan[0]}
+function getCurrentExercise(){
+ const day=getTodayPlan();
+ return day && day.exercises ? day.exercises[state.workout.ex] : null;
+}
+function exerciseDefinition(name){
+ const lib=exerciseLibrary.find(x=>x[0]===name);
+ return lib ? makeExercise(lib[0],lib[1],lib[2],lib[3],lib[4]) : makeExercise(name,3,8,12,90);
+}
+function populateSubstituteSelect(){
+ const select=$("#substituteSelect");
+ if(!select)return;
+ const current=getCurrentExercise();
+ const currentName=current ? current.name : "";
+ const customNames=state.plan.flatMap(d=>d.exercises.map(e=>e.name));
+ const names=[...new Set([...exerciseLibrary.map(x=>x[0]),...customNames])]
+   .filter(n=>n!==currentName);
+ select.innerHTML=names.map(n=>`<option>${n}</option>`).join("");
+}
+function openSubstitute(){
+ populateSubstituteSelect();
+ $("#substitutePanel").classList.remove("hidden");
+}
+function closeSubstitute(){
+ $("#substitutePanel").classList.add("hidden");
+}
+function substituteCurrentExercise(){
+ const day=getTodayPlan();
+ if(!day || !day.exercises[state.workout.ex])return;
+ const selected=$("#substituteSelect").value;
+ if(!selected)return;
+
+ // IMPORTANT: do not alter or delete the original exercise in the plan.
+ // Only this workout session gets a replacement.
+ const replacement=exerciseDefinition(selected);
+ state.workout.sessionReplacements=state.workout.sessionReplacements||{};
+ state.workout.sessionReplacements[state.workout.ex]=replacement;
+
+ // Clear the old exercise's current-set rest timer and render the replacement.
+ clearInterval(timerId);
+ $("#restCard").classList.add("hidden");
+ $("#completeSet").disabled=false;
+ closeSubstitute();
+ initWorkout();
+ save();
+}
 function initWorkout(){
  const day=getTodayPlan();
  if(!day||!day.exercises.length)return;
- const x=state.workout.ex,set=state.workout.set,e=day.exercises[x]||day.exercises[0];
+ const x=state.workout.ex,set=state.workout.set;
+ const original=day.exercises[x]||day.exercises[0];
+ const replacements=state.workout.sessionReplacements||{};
+ const e=replacements[x]||original;
  $("#wName").textContent=e.name;
  $("#wTarget").textContent=`${e.repsMin}–${e.repsMax} repetições · descanso ${e.rest}s`;
  $("#setNo").textContent=set;$("#setTotal").textContent=e.sets;
@@ -164,15 +212,16 @@ function initWorkout(){
  $("#wWeight").value=prev?prev.weight:0;
  $("#wReps").value=prev?Math.min(e.repsMax,Math.max(e.repsMin,prev.reps)):e.repsMin;
  $("#lastHint").textContent=prev?`Último: ${prev.weight} kg × ${prev.reps}`:"";
- $("#nextExercise").textContent=x<day.exercises.length-1?day.exercises[x+1].name:"Finalizar treino";
+ const next=day.exercises[x+1];
+ $("#nextExercise").textContent=next?((replacements[x+1]||next).name):"Finalizar treino";
 }
 function startRest(){
- const day=getTodayPlan(),e=day.exercises[state.workout.ex];
+ const day=getTodayPlan(),original=day.exercises[state.workout.ex],replacements=state.workout.sessionReplacements||{},e=replacements[state.workout.ex]||original;
  remaining=e.rest;$("#restCard").classList.remove("hidden");$("#completeSet").disabled=true;updateTimer();clearInterval(timerId);
  timerId=setInterval(()=>{remaining--;updateTimer();if(remaining<=0){clearInterval(timerId);$("#restCard").classList.add("hidden");$("#completeSet").disabled=false}},1000)
 }
 function updateTimer(){
- const day=getTodayPlan(),e=day.exercises[state.workout.ex],m=String(Math.floor(remaining/60)).padStart(2,"0"),s=String(remaining%60).padStart(2,"0");
+ const day=getTodayPlan(),original=day.exercises[state.workout.ex],replacements=state.workout.sessionReplacements||{},e=replacements[state.workout.ex]||original,m=String(Math.floor(remaining/60)).padStart(2,"0"),s=String(remaining%60).padStart(2,"0");
  $("#timer").textContent=m+":"+s;$("#timerFill").style.width=Math.max(0,remaining/e.rest*100)+"%"
 }
 
@@ -200,11 +249,14 @@ $("#saveCustom").addEventListener("click",()=>{
  state.plan[dayIndex].exercises.push(makeExercise(name,sets,min,max,rest));save();
  $("#customName").value="";$("#customExerciseForm").classList.add("hidden");renderPlanEditor();
 });
+$("#substituteExercise").addEventListener("click",()=>openSubstitute());
+$("#cancelSubstitute").addEventListener("click",()=>closeSubstitute());
+$("#confirmSubstitute").addEventListener("click",()=>substituteCurrentExercise());
 $("#startWorkout").addEventListener("click",()=>{
  const day=getTodayPlan();
  if(!day||!day.exercises.length){alert("Este treino ainda não tem exercícios.");return}
  state.currentDay=state.plan.indexOf(day);
- state.workout={ex:0,set:1,done:0,dayIndex:state.currentDay,session:[]};
+ state.workout={ex:0,set:1,done:0,dayIndex:state.currentDay,session:[],sessionReplacements:{}};
  go("workout");
  initWorkout();
 });
@@ -212,7 +264,7 @@ $("#backDash").addEventListener("click",()=>{clearInterval(timerId);updateDash()
 $("#skipRest").addEventListener("click",()=>{clearInterval(timerId);$("#restCard").classList.add("hidden");$("#completeSet").disabled=false});
 
 $("#completeSet").addEventListener("click",()=>{
- const day=getTodayPlan(),e=day.exercises[state.workout.ex],w=Number($("#wWeight").value),r=Number($("#wReps").value);
+ const day=getTodayPlan(),original=day.exercises[state.workout.ex],replacements=state.workout.sessionReplacements||{},e=replacements[state.workout.ex]||original,w=Number($("#wWeight").value),r=Number($("#wReps").value);
  if(!Number.isFinite(w)||w<0||w>500||!Number.isInteger(r)||r<1||r>100){alert("Coloque uma carga e um número de repetições válidos.");return}
  const date=new Date().toLocaleDateString("pt-BR");
  state.history.push({exercise:e.name,weight:w,reps:r,date});
