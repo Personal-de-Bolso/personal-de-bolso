@@ -1,3 +1,4 @@
+document.addEventListener("DOMContentLoaded",()=>{
 const state={profile:{},style:"sergeant",answers:{},q:0,plan:[],workout:{ex:0,set:1,done:0},xp:0,total:0,streak:0};
 const $=s=>document.querySelector(s), screens=[...document.querySelectorAll(".screen")];
 const questions=[
@@ -80,3 +81,5 @@ $("#completeSet").addEventListener("click",()=>{
 });
 $("#finishHome").addEventListener("click",()=>{updateDash();go("dashboard")});
 if(load()){updateDash();go("dashboard")}
+
+});
