@@ -55,12 +55,12 @@
 </section>
 
 <section class="screen" id="plan">
-  <div class="top"><span>PRIMEIRO PLANO</span><span class="status">RASCUNHO</span></div>
+  <div class="top"><span>PRIMEIRO PLANO</span><span class="status">EDITÁVEL</span></div>
   <h2 id="planTitle"></h2><p class="muted" id="planIntro"></p>
   <div class="callout"><b>🤖 Por que esse plano?</b><p id="planReason"></p></div>
-  <div id="planCards"></div>
-  <button class="primary" id="acceptPlan">🔥 ACEITAR TREINO</button>
-  <button class="secondary" id="editPlan">EDITAR TREINO</button>
+  <div id="planCards" class="editable-plan"></div>
+  <button class="secondary" id="addDay">＋ ADICIONAR TREINO</button>
+  <button class="primary" id="acceptPlan">🔥 SALVAR E ACEITAR TREINO</button>
 </section>
 
 <section class="screen" id="dashboard">
@@ -71,7 +71,15 @@
     <div class="eyebrow">TREINO DE HOJE</div><h3 id="todayName">Treino A</h3><p id="todayMeta"></p>
     <button class="primary" id="startWorkout">🔥 COMEÇAR TREINO</button>
   </div>
-  <div class="grid2 stats"><div class="stat"><small>SEQUÊNCIA</small><b id="streak">0 🔥</b></div><div class="stat"><small>TREINOS</small><b id="totalWorkouts">0</b></div></div>
+  <div class="grid2 stats">
+    <div class="stat"><small>SEQUÊNCIA</small><b id="streak">0 🔥</b></div>
+    <div class="stat"><small>TREINOS</small><b id="totalWorkouts">0</b></div>
+  </div>
+  <div class="pb-card history-card">
+    <div class="eyebrow">PROGRESSÃO</div>
+    <h3 id="progressTitle">Seu último treino</h3>
+    <p id="progressText" class="muted"></p>
+  </div>
   <div class="pb-card"><div class="eyebrow">PERSONAL</div><p id="dashMessage" class="quote"></p></div>
 </section>
 
@@ -91,7 +99,10 @@
 </section>
 
 <section class="screen" id="finish">
-  <div class="finish"><div class="trophy">🏆</div><div class="eyebrow">MISSÃO CONCLUÍDA</div><h2>Treino terminado.</h2><div class="gain">+<span id="gainXp">400</span> XP</div><p id="finishText" class="muted"></p><button class="primary" id="finishHome">VOLTAR PARA HOME</button></div>
+  <div class="finish"><div class="trophy">🏆</div><div class="eyebrow">MISSÃO CONCLUÍDA</div><h2>Treino terminado.</h2><div class="gain">+<span id="gainXp">400</span> XP</div>
+    <div id="finishProgress" class="callout finish-progress"></div>
+    <p id="finishText" class="muted"></p><button class="primary" id="finishHome">VOLTAR PARA HOME</button>
+  </div>
 </section>
 </main>
 <script src="app.js"></script>

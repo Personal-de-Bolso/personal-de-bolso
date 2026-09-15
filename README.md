@@ -1,20 +1,21 @@
-# Personal de Bolso — V1.1.2
+# Personal de Bolso — V1.2
 
-Correção da personalidade **Sargento**.
-
-## Correção
-Agora os três modos do app correspondem exatamente às opções exibidas:
-
-- 🤝 Parceiro — direto e motivador, sem pressão desnecessária.
-- 😈 Sargento — cobra disciplina e confronta a negociação com a preguiça.
-- ☠️ Sem Piedade — mais provocador e confrontativo.
-
-O Sargento continua sendo o modo selecionado por padrão.
+## Novidades
+- Editor completo do treino antes de aceitar.
+- Adicionar/remover treinos.
+- Adicionar/remover exercícios.
+- Alterar séries e faixa de repetições.
+- Histórico de carga e repetições por exercício.
+- Última carga/repetição aparece automaticamente no próximo treino.
+- Progressão contextual básica baseada no histórico.
+- Treino de hoje avança automaticamente pelo ciclo.
+- XP, sequência e missão semanal preservados.
+- Mensagens diferentes para Parceiro, Sargento e Sem Piedade.
 
 ## Atualização no GitHub
-Substitua no repositório os arquivos:
+Substitua no repositório:
 - index.html
 - styles.css
 - app.js
 
-Depois faça **Commit changes** e, quando o GitHub Pages atualizar, use **Ctrl + F5** para recarregar sem cache.
+Faça Commit changes e aguarde o GitHub Pages publicar. Depois use Ctrl + F5.
